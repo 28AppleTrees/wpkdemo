@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration status="WARN">
+
+    <appenders>
+        <!--这个输出控制台的配置-->
+        <console name="Console" target="SYSTEM_OUT">
+            <!--输出日志的格式-->
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%logger{50}:%L] - %msg%n"/>
+        </console>
+    </appenders>
+    <loggers>
+        <root level="DEBUG">
+            <appender-ref ref="Console"/>
+        </root>
+    </loggers>
+</configuration>

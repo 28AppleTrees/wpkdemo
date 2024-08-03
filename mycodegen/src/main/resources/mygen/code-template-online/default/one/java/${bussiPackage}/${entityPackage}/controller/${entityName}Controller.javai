@@ -1,0 +1,146 @@
+package ${bussiPackage}.${entityPackage}.controller;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import ${bussiPackage}.${entityPackage}.entity.${entityName};
+import ${bussiPackage}.${entityPackage}.service.I${entityName}Service;
+import ${resultPackage}.${resultName?cap_first};
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.Map;
+
+<#assign bpm_flag=false>
+<#list originalColumns as po>
+<#if po.fieldDbName=='bpm_status'>
+  <#assign bpm_flag=true>
+</#if>
+</#list>
+
+ /**
+ * @Description: ${tableVo.ftlDescription}
+ * @Author: wangpengkai
+ * @Date: ${.now?string["yyyy-MM-dd HH:mm:ss"]}
+ * @Version: V1.0
+ */
+@Api(tags="${tableVo.ftlDescription}")
+@RestController
+@RequestMapping("/${entityPackage}/${entityName?uncap_first}")
+@Slf4j
+public class ${entityName}Controller  {
+	@Autowired
+	private I${entityName}Service ${entityName?uncap_first}Service;
+
+
+	public static LambdaQueryWrapper<${entityName}> initQueryWrapper(${entityName} searchObj, Map<String, String[]> parameterMap){
+		long start = System.currentTimeMillis();
+		QueryWrapper<${entityName}> queryWrapper = new QueryWrapper<${entityName}>();
+		LambdaQueryWrapper<${entityName}> lambdaQueryWrapper = queryWrapper.lambda();
+        if (searchObj == null) {
+            return lambdaQueryWrapper;
+        }
+		log.debug("---查询条件构造器初始化完成,耗时:"+(System.currentTimeMillis()-start)+"毫秒----");
+		return lambdaQueryWrapper;
+	}
+
+	/**
+	 * 分页列表查询
+	 *
+	 * @param ${entityName?uncap_first}
+	 * @param pageNo
+	 * @param pageSize
+	 * @param req
+	 * @return
+	 */
+	@ApiOperation(value="${tableVo.ftlDescription}-分页列表查询", notes="${tableVo.ftlDescription}-分页列表查询")
+	@GetMapping(value = "/list")
+	public ${resultName?cap_first}<IPage<${entityName}>> queryPageList(${entityName} ${entityName?uncap_first},
+								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+								   HttpServletRequest req) {
+		LambdaQueryWrapper<${entityName}> queryWrapper = initQueryWrapper(${entityName?uncap_first}, req.getParameterMap());
+		Page<${entityName}> page = new Page<${entityName}>(pageNo, pageSize);
+		IPage<${entityName}> pageList = ${entityName?uncap_first}Service.page(page, queryWrapper);
+		return ${resultName?cap_first}.${resultMethodSuccess}(pageList);
+	}
+
+	/**
+	 *   添加
+	 *
+	 * @param ${entityName?uncap_first}
+	 * @return
+	 */
+//    @ApiOperation(value="${tableVo.ftlDescription}-添加", notes="${tableVo.ftlDescription}-添加")
+//    @PostMapping(value = "/add")
+	public ${resultName?cap_first}<String> add(@RequestBody ${entityName} ${entityName?uncap_first}) {
+	    <#if bpm_flag>
+        ${entityName?uncap_first}.setBpmStatus("1");
+	    </#if>
+		${entityName?uncap_first}Service.save(${entityName?uncap_first});
+		return ${resultName?cap_first}.${resultMethodSuccess}("添加成功！");
+	}
+
+	/**
+	 *  编辑
+	 *
+	 * @param ${entityName?uncap_first}
+	 * @return
+	 */
+//    @ApiOperation(value="${tableVo.ftlDescription}-编辑", notes="${tableVo.ftlDescription}-编辑")
+//    @RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
+	public ${resultName?cap_first}<String> edit(@RequestBody ${entityName} ${entityName?uncap_first}) {
+		${entityName?uncap_first}Service.updateById(${entityName?uncap_first});
+		return ${resultName?cap_first}.${resultMethodSuccess}("编辑成功!");
+	}
+
+	/**
+	 *   通过id删除
+	 *
+	 * @param id
+	 * @return
+	 */
+//    @ApiOperation(value="${tableVo.ftlDescription}-通过id删除", notes="${tableVo.ftlDescription}-通过id删除")
+//    @DeleteMapping(value = "/delete")
+	public ${resultName?cap_first}<String> delete(@RequestParam(name="id",required=true) String id) {
+		${entityName?uncap_first}Service.removeById(id);
+		return ${resultName?cap_first}.${resultMethodSuccess}("删除成功!");
+	}
+
+	/**
+	 *  批量删除
+	 *
+	 * @param ids
+	 * @return
+	 */
+//    @ApiOperation(value="${tableVo.ftlDescription}-批量删除", notes="${tableVo.ftlDescription}-批量删除")
+//    @DeleteMapping(value = "/deleteBatch")
+	public ${resultName?cap_first}<String> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		this.${entityName?uncap_first}Service.removeByIds(Arrays.asList(ids.split(",")));
+		return ${resultName?cap_first}.${resultMethodSuccess}("批量删除成功!");
+	}
+
+	/**
+	 * 通过id查询
+	 *
+	 * @param id
+	 * @return
+	 */
+	@ApiOperation(value="${tableVo.ftlDescription}-通过id查询", notes="${tableVo.ftlDescription}-通过id查询")
+	@GetMapping(value = "/queryById")
+	public ${resultName?cap_first}<${entityName}> queryById(@RequestParam(name="id",required=true) String id) {
+		${entityName} ${entityName?uncap_first} = ${entityName?uncap_first}Service.getById(id);
+		if(${entityName?uncap_first}==null) {
+			return ${resultName?cap_first}.${resultMethodError}("未找到对应数据");
+		}
+		return ${resultName?cap_first}.${resultMethodSuccess}(${entityName?uncap_first});
+	}
+
+
+}
