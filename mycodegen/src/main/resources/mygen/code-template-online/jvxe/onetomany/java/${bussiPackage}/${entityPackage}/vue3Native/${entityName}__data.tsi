@@ -155,7 +155,7 @@ export const searchFormSchema: FormSchema[] = [
 <#elseif po.fieldDbType=='int' || po.fieldDbType=='double' || po.fieldDbType=='BigDecimal'>
       component: 'JRangeNumber',
 <#else>
-      component: 'Input', //TODO 范围查询
+      component: 'Input',
 </#if>
       //colProps: {span: 6},
 	},
@@ -243,7 +243,7 @@ export const formSchema: FormSchema[] = [
     <#assign form_cat_tree = true>
     component: 'JCategorySelect',
     componentProps:{
-       pcode:"${po.dictField?default("")}", //TODO back和事件未添加，暂时有问题
+       pcode:"${po.dictField?default("")}",
     },
     <#if po.dictText?default("")?trim?length gt 1>
     <#assign form_cat_back = "${po.dictText}">
@@ -349,7 +349,6 @@ export const formSchema: FormSchema[] = [
 </#if>
 </#list>
 <#if id_exists == false>
-	// TODO 主键隐藏字段，目前写死为ID
 	{
 	  label: '',
 	  field: 'id',
@@ -439,7 +438,7 @@ export const ${sub.entityName?uncap_first}FormSchema: FormSchema[] = [
     <#assign form_cat_tree = true>
     component: 'JCategorySelect',
     componentProps:{
-       pcode:"${po.dictField?default("")}", //TODO back和事件未添加，暂时有问题
+       pcode:"${po.dictField?default("")}",
     },
     <#if po.dictText?default("")?trim?length gt 1>
     <#assign form_cat_back = "${po.dictText}">

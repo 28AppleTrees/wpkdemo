@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
 
 /**
  * @Description: ${tableVo.ftlDescription}
- * @Author: wangpengkai
+ * @Author:
  * @Date: ${.now?string["yyyy-MM-dd HH:mm:ss"]}
  * @Version: V1.0
  */

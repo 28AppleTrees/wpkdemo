@@ -15,6 +15,9 @@ public class MyGen {
         gen();
     }
 
+    /**
+     * 使用的是resources\mygen\code-template\one的模板
+     */
     private static void gen() {
         HashSet<String> tableNames = new HashSet<>();
         // 表名
@@ -42,7 +45,7 @@ public class MyGen {
                     if (comment != null) {
                         tempTable.setFtlDescription(comment);
                     }
-                    // main使用online模板, 需要指定 default.one
+                    // main使用online模板, 需要指定 default.one, online模板未修剪
 //                    new CodeGenerateOne(tempTable).generateCodeFile("default.one");
                     new CodeGenerateOne(tempTable).generateCodeFile(null);
                 }

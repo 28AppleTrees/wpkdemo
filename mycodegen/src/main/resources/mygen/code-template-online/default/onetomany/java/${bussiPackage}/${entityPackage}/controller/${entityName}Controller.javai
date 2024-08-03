@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jeecgframework.poi.excel.ExcelImportUtil;
+import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.entity.ImportParams;
@@ -55,7 +55,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 
  /**
  * @Description: ${tableVo.ftlDescription}
- * @Author: wangpengkai
+ * @Author:
  * @Date:   ${.now?string["yyyy-MM-dd"]}
  * @Version: V1.0
  */
@@ -197,89 +197,5 @@ public class ${entityName}Controller {
 		return Result.OK(${sub.entityName?uncap_first}List);
 	}
 	</#list>
-
-    /**
-    * 导出excel
-    *
-    * @param request
-    * @param ${entityName?uncap_first}
-    */
-    @RequiresPermissions("${entityPackage}:${tableName}:exportXls")
-    @RequestMapping(value = "/exportXls")
-    public ModelAndView exportXls(HttpServletRequest request, ${entityName} ${entityName?uncap_first}) {
-      // Step.1 组装查询条件查询数据
-      QueryWrapper<${entityName}> queryWrapper = QueryGenerator.initQueryWrapper(${entityName?uncap_first}, request.getParameterMap());
-      LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-
-      //配置选中数据查询条件
-      String selections = request.getParameter("selections");
-      if(oConvertUtils.isNotEmpty(selections)) {
-          List<String> selectionList = Arrays.asList(selections.split(","));
-          queryWrapper.in("id",selectionList);
-      }
-      //Step.2 获取导出数据
-      List<${entityName}> ${entityName?uncap_first}List = ${entityName?uncap_first}Service.list(queryWrapper);
-
-      // Step.3 组装pageList
-      List<${entityName}Page> pageList = new ArrayList<${entityName}Page>();
-      for (${entityName} main : ${entityName?uncap_first}List) {
-          ${entityName}Page vo = new ${entityName}Page();
-          BeanUtils.copyProperties(main, vo);
-          <#list subTables as sub>
-          List<${sub.entityName}> ${sub.entityName?uncap_first}List = ${sub.entityName?uncap_first}Service.selectByMainId(main.getId());
-          vo.set${sub.entityName}List(${sub.entityName?uncap_first}List);
-          </#list>
-          pageList.add(vo);
-      }
-
-      // Step.4 AutoPoi 导出Excel
-      ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-      mv.addObject(NormalExcelConstants.FILE_NAME, "${tableVo.ftlDescription}列表");
-      mv.addObject(NormalExcelConstants.CLASS, ${entityName}Page.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("${tableVo.ftlDescription}数据", "导出人:"+sysUser.getRealname(), "${tableVo.ftlDescription}"));
-      mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
-      return mv;
-    }
-
-    /**
-    * 通过excel导入数据
-    *
-    * @param request
-    * @param response
-    * @return
-    */
-    @RequiresPermissions("${entityPackage}:${tableName}:importExcel")
-    @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
-    public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
-      MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-      Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
-      for (Map.Entry<String, MultipartFile> entity : fileMap.entrySet()) {
-          // 获取上传文件对象
-          MultipartFile file = entity.getValue();
-          ImportParams params = new ImportParams();
-          params.setTitleRows(2);
-          params.setHeadRows(1);
-          params.setNeedSave(true);
-          try {
-              List<${entityName}Page> list = ExcelImportUtil.importExcel(file.getInputStream(), ${entityName}Page.class, params);
-              for (${entityName}Page page : list) {
-                  ${entityName} po = new ${entityName}();
-                  BeanUtils.copyProperties(page, po);
-                  ${entityName?uncap_first}Service.saveMain(po, <#list subTables as sub>page.get${sub.entityName}List()<#if sub_has_next>,</#if></#list>);
-              }
-              return Result.OK("文件导入成功！数据行数:" + list.size());
-          } catch (Exception e) {
-              log.error(e.getMessage(),e);
-              return Result.error("文件导入失败:"+e.getMessage());
-          } finally {
-              try {
-                  file.getInputStream().close();
-              } catch (IOException e) {
-                  e.printStackTrace();
-              }
-          }
-      }
-      return Result.OK("文件导入失败！");
-    }
 
 }

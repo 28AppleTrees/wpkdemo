@@ -53,7 +53,7 @@ public class DbReadTableUtil {
             } else {
                 throw new Exception("表详情查询仅支持mysql");
             }
-            // todo 其他类型数据库查表详情sql
+            // todo mygen 其他类型数据库查表详情sql
             /*if (DatabaseUtil.b(GenerateConfig.url)) {
                 sql = " select distinct colstable.table_name as  table_name from user_tab_cols colstable order by colstable.table_name";
             }

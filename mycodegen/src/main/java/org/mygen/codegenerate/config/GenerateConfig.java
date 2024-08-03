@@ -197,7 +197,6 @@ public class GenerateConfig {
     }
 
     static {
-        // todo mygen readProperties()路径错误, 无法读取配置文件
         databaseResourceBundle = readProperties("mygen/mygen_database");
         if (databaseResourceBundle == null) {
             log.debug("通过class目录加载配置文件 mygen/mygen_database");
@@ -231,8 +230,9 @@ public class GenerateConfig {
             a = var0;
         }
 
-        resultName = "result";
-        resultPackage = "org.jeecg.common.api.vo";
+        resultName = "resultNameReplace";
+        // todo mygen 通用result修改
+        resultPackage = "org.wpk.resultReplace";
         resultMethodSuccess = "OK";
         resultMethodError = "error";
 
