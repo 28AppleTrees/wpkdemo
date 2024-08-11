@@ -13,6 +13,7 @@
         <module>wpkboot-core</module>
         <module>cloud-gateway</module>
         <module>wpk-netty-server</module>
+        <module>wpk-system</module>
     </modules>
 
     <!-- 属性 -->
