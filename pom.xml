@@ -9,6 +9,7 @@
     <version>0.0.1</version>
     <packaging>pom</packaging>
     <modules>
+        <module>wpkboot-core</module>
         <module>mycodegen</module>
     </modules>
 
@@ -18,7 +19,241 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- https://spring.io/projects/spring-cloud#overview -->
+        <spring-cloud.version>2021.0.9</spring-cloud.version>
+        <spring-cloud-alibaba.version>2021.1</spring-cloud-alibaba.version>
+        <!-- springboot3.x不在支持jdk1.8 -->
+        <spring-boot.version>2.7.17</spring-boot.version>
+        <springboot-log4j2.version>3.3.2</springboot-log4j2.version>
+        <spring.version>5.3.30</spring.version>
 
+        <lombok.version>1.18.22</lombok.version>
+        <slf4j-api.version>2.0.9</slf4j-api.version>
+
+        <!-- springboot-aop2.9.7引入的aspectj的版本是1.9.7 -->
+        <aspectj.version>1.9.7</aspectj.version>
+        <easypoi.version>4.5.0</easypoi.version>
+        <mybatis-plus.version>3.5.6</mybatis-plus.version>
+        <mysql.version>8.0.33</mysql.version>
+        <druid.version>1.2.9</druid.version>
+        <shiro.version>1.13.0</shiro.version>
+        <netty.version>4.1.99.Final</netty.version>
+        <snakeyaml.version>1.30</snakeyaml.version>
+        <maven.plugin.version>2.7.9</maven.plugin.version>
+        <maven.plugin.resources.version>3.1.0</maven.plugin.resources.version>
+        <maven.plugin.surefire.version>3.1.0</maven.plugin.surefire.version>
+        <maven.plugin.compiler.version>3.9.0</maven.plugin.compiler.version>
+        <maven.plugin.jar.version>3.2.0</maven.plugin.jar.version>
     </properties>
 
+    <!-- 依赖版本控制 -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- spring-cloud版本管理 -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-autoconfigure</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <!-- log4j2 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-log4j2</artifactId>
+                <version>${springboot-log4j2.version}</version>
+            </dependency>
+            <!-- easypoi -->
+            <dependency>
+                <groupId>cn.afterturn</groupId>
+                <artifactId>easypoi-spring-boot-starter</artifactId>
+                <version>${easypoi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j-api.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <!-- nacos snakeyaml版本冲突 -->
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeyaml.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${maven.plugin.version}</version>
+                <configuration>
+                    <!--微服务模式下修改为true,跳过此打包插件，否则微服务模块无法引用-->
+                    <skip>false</skip>
+                    <includeSystemScope>true</includeSystemScope>
+                </configuration>
+                <!--                该配置可行, 但需要每个mainClass手动指定 -->
+                <!--                <executions>-->
+                <!--                    <execution>-->
+                <!--                        <id>wpk-system-biz</id>-->
+                <!--                        <configuration>-->
+                <!--                            <mainClass>org.wpk.WpkSystemApplication</mainClass>-->
+                <!--                            <finalName>{project.artifactId}-${project.version}</finalName>-->
+                <!--                        </configuration>-->
+                <!--                    </execution>-->
+                <!--                </executions>-->
+            </plugin>
+            <!-- 指定JDK编译版本 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.plugin.compiler.version}</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <!-- 打包跳过测试 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.plugin.surefire.version}</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+            <!-- 避免font文件的二进制文件格式压缩破坏 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven.plugin.resources.version}</version>
+                <configuration>
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>woff</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>eot</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>svg</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
+                </configuration>
+            </plugin>
+        </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>**/*.json</include>
+                    <include>**/*.ftl</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+
+    <!-- 环境 -->
+    <profiles>
+        <!-- 开发 -->
+        <profile>
+            <id>dev</id>
+            <activation>
+                <!--默认激活配置-->
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <!--当前环境-->
+                <profile.name>dev</profile.name>
+            </properties>
+        </profile>
+        <!-- 测试 -->
+        <profile>
+            <id>test</id>
+            <properties>
+                <profile.name>test</profile.name>
+            </properties>
+        </profile>
+        <!-- 生产 -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <!--当前环境-->
+                <profile.name>prod</profile.name>
+            </properties>
+        </profile>
+        <!-- SpringCloud运行环境 -->
+        <profile>
+            <id>SpringCloud</id>
+            <modules>
+                <!-- 微服务模块-->
+                <module>wpk-server-cloud</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>
