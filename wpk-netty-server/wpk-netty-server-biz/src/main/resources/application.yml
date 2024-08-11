@@ -1,0 +1,13 @@
+server:
+  servlet:
+    context-path: /netty-server-application
+spring:
+  profiles:
+    active: dev
+  application:
+    name: netty-server-application
+logging:
+  level:
+    root: info
+  # 日志配置文件
+  config: classpath:log4j2-spring-${spring.profiles.active}.xml

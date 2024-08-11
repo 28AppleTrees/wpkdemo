@@ -12,6 +12,7 @@
         <module>mycodegen</module>
         <module>wpkboot-core</module>
         <module>cloud-gateway</module>
+        <module>wpk-netty-server</module>
     </modules>
 
     <!-- 属性 -->
