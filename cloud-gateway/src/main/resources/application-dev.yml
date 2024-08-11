@@ -1,0 +1,31 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: wpk-system
+          uri: lb://wpk-system
+          predicates:
+            - Path=/wpk-system/**
+        # 唯一标识
+        - id: netty-server
+          # 转发地址, 要和netty-server服务注册nacos一致, 配置lb后需要在pom引入loadbalancer依赖
+#          uri: lb:ws://netty-server
+          uri: lb:ws://netty-server
+          # 请求路径匹配规则
+          predicates:
+            - Path=/netty/**
+          # 过滤器
+          filters:
+            # 截断请求路径第一段, /netty/ws >>> /ws
+            # http://127.0.0.1:80/netty/ws >>> http://127.0.0.1:60000/ws
+            - StripPrefix=1
+        - id: netty-server-application
+          uri: lb://netty-server-application
+          predicates:
+            - Path=/netty-server-application/**
+    nacos:
+      # nacos服务发现
+      discovery:
+        server-addr: 39.105.162.129:8848
+        namespace: public
+
