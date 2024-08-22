@@ -1,0 +1,11 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    # 该名称也会在nacos进行注册
+    name: wpk-ai
+logging:
+  level:
+    root: info
+  # 日志配置文件
+  config: classpath:log4j2-spring-${spring.profiles.active}.xml

@@ -1,0 +1,23 @@
+MYSQL-HOST: 127.0.0.1
+MYSQL-PORT: 3306
+MYSQL-USERNAME: dev
+MYSQL-PASSWORD: dev
+SERVER-PORT: 8888
+
+server:
+  port: ${SERVER-PORT:8080}
+  servlet:
+    context-path: /${spring.application.name}
+
+spring:
+  cloud:
+    nacos:
+      # nacos服务发现
+      discovery:
+        server-addr: 39.105.162.129:8848
+        namespace: ${spring.profiles.active}
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL-PORT}/jeecg-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    username: ${MYSQL-USERNAME}
+    password: ${MYSQL-PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
