@@ -91,16 +91,16 @@ public class NettyServer implements ApplicationRunner {
                         }
                     });
             // 输出配置项
-            log.info("wpk-netty-server properties:{}", serverProperties);
+            log.info("netty-server properties:{}", serverProperties);
 
             // 绑定端口（阻塞）, 直到绑定操作完成
             ChannelFuture channelFuture = serverBootstrap.bind(serverProperties.getPort()).sync();
-            log.info("wpk-netty-server start port:{}", serverProperties.getPort());
-            log.info("wpk-netty-server start webSocketPath:{}", serverProperties.getWebSocketPath());
+            log.info("netty-server start port:{}", serverProperties.getPort());
+            log.info("netty-server start webSocketPath:{}", serverProperties.getWebSocketPath());
 
             // 注册nacos
             registerNacos();
-            log.info("wpk-netty-server register with nacos");
+            log.info("netty-server register with nacos");
 
             // 监听通道（阻塞）
             channelFuture.channel().closeFuture().sync();
