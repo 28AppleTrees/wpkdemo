@@ -3,6 +3,7 @@ package org.wpk.paddle;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -105,7 +106,7 @@ public class PaddleProcessBuilder {
         String ocrKey = paramMap.get(ARGS_KEY_OCRKEY);
 
         // key:要识别的文本
-        String key = "接受";
+        String key = ocrKey;
         // keyIndex:选定截取图片范围, 识别文本重复, 通过 keyIndex 确定选定第几个, 从左上角开始, 逐行数, 注意长文本算一个元素
         int keyIndex = 0;
         /*int startX = 1505;
@@ -181,10 +182,9 @@ public class PaddleProcessBuilder {
 //                    System.out.println("avgLength=" + avgLength);
                 // 点击位置x=截取开始+定位开始+avgWidth
                 // 点击位置y=截取开始+定位开始+avgLength
-                clickRight(startX + x0 + avgWidth, startY + y0 + avgLength);
+                clickLeft(startX + x0 + avgWidth, startY + y0 + avgLength);
             }
         }
-
     }
 
     public static Map<String, int[]> parseLocate(String locateStr) {
@@ -207,7 +207,7 @@ public class PaddleProcessBuilder {
         return map;
     }
 
-    public static java.util.List<String> ocrProcess(String[] cmdParams) throws IOException, InterruptedException {
+    public static List<String> ocrProcess(String[] cmdParams) throws IOException, InterruptedException {
         // 使用ProcessBuilder类执行命令, command每次调用是覆盖操作
         PROCESS_BUILDER.command(cmdParams);
         PROCESS_BUILDER.redirectErrorStream(true); // 将错误流重定向到标准输出流
@@ -219,7 +219,7 @@ public class PaddleProcessBuilder {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()))
         ){
-            java.util.List<String> lineList = new ArrayList<>();
+            List<String> lineList = new ArrayList<>();
             String line;
             while ((line = reader.readLine()) != null) {
 //                System.out.println(line);
@@ -242,8 +242,8 @@ public class PaddleProcessBuilder {
      * 解析ocr识别结果
      * @return
      */
-    public static java.util.List<String[]> parseORCResult(java.util.List<String> ocrResultList) {
-        java.util.List<String[]> resultList = new ArrayList<>();
+    public static List<String[]> parseORCResult(List<String> ocrResultList) {
+        List<String[]> resultList = new ArrayList<>();
         int collectIndex = 0;
         for (String line : ocrResultList) {
             if (line.startsWith(collectIndex + "\tdet boxes: ")) {
@@ -352,6 +352,21 @@ public class PaddleProcessBuilder {
         ROBOT.mousePress(InputEvent.BUTTON3_DOWN_MASK);
         // 松开左键
         ROBOT.mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
+    }
+
+    /**
+     * 按下并释放键盘
+     * @param key {@link KeyEvent#VK_A}
+     */
+    public static void clickKey(int key) {
+        ROBOT.keyPress(key);
+        ROBOT.keyRelease(key);
+//        try {
+//            // 延迟100ms
+//            TimeUnit.MILLISECONDS.sleep(100);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     /**
