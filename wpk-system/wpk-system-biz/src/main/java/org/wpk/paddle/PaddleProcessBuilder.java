@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class PaddleProcessBuilder {
     private static final Robot ROBOT;
-    private static final Rectangle SCREEN_RECT;
+    private static final Rectangle FULL_SCREEN_RECTANGLE;
     // windows屏幕缩放比例
     private static final double WIN_SCREEN_RATE = 1.25;
 
@@ -27,13 +27,34 @@ public class PaddleProcessBuilder {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 
+    private static final String ARGS_PREFIX = "-";
+//    private static final String ARGS_KEY_EXE = "exePath";
+    private static final String ARGS_KEY_X = "x";
+    private static final String ARGS_KEY_Y = "y";
+    private static final String ARGS_KEY_X2 = "x2";
+    private static final String ARGS_KEY_Y2 = "y2";
+    private static final String ARGS_KEY_OCRKEY = "ocrKey";
+    private static final String[] ARGS_KEY_ARR = {
+//            ARGS_PREFIX + ARGS_KEY_EXE,
+            ARGS_PREFIX + ARGS_KEY_X,
+            ARGS_PREFIX + ARGS_KEY_Y,
+            ARGS_PREFIX + ARGS_KEY_X2,
+            ARGS_PREFIX + ARGS_KEY_Y2,
+            ARGS_PREFIX + ARGS_KEY_OCRKEY
+    };
+
     public static void main(String[] args) {
+        Map<String, String> argMap = parseArgs(args);
+        if (argMap == null || argMap.size() == 0) {
+            System.err.println("未获取到执行参数:" + Arrays.toString(ARGS_KEY_ARR));
+            return;
+        }
         PaddleProcessBuilder paddleProcessBuilder = new PaddleProcessBuilder();
         Runnable task = new Runnable() {
             @Override
             public void run() {
                 try {
-                    paddleProcessBuilder.task(args);
+                    paddleProcessBuilder.task(argMap);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } catch (InterruptedException e) {
@@ -47,36 +68,75 @@ public class PaddleProcessBuilder {
                 }
             }
         };
-        // 延迟1秒后首次执行，并且之后每3秒执行一次
-        executor.scheduleAtFixedRate(task, 1, 3, TimeUnit.SECONDS);
+        // 延迟1秒后首次执行，并且之后每5秒执行一次
+        executor.scheduleAtFixedRate(task, 1, 5, TimeUnit.SECONDS);
     }
+
+    public static Map<String, String> parseArgs(String[] args) {
+        if (args == null || args.length == 0) {
+            return null;
+        }
+        HashMap<String, String> argMap = new HashMap<>();
+        for (String arg : args) {
+            for (String argKey : ARGS_KEY_ARR) {
+                if (arg.startsWith(argKey)) {
+                    String[] split = arg.split("=");
+                    if (split.length == 1) {
+                        argMap.put(split[0].substring(1),  null);
+                    } else {
+                        argMap.put(split[0].substring(1),  split[1]);
+                    }
+                }
+            }
+        }
+        return argMap;
+    }
+
 
     /**
      * 具体执行逻辑
-     * @param args
+     * @param paramMap
      */
-    public void task(String[] args) throws IOException, InterruptedException {
+    public void task(Map<String, String> paramMap) throws IOException, InterruptedException {
+        String argX = paramMap.get(ARGS_KEY_X);
+        String argY = paramMap.get(ARGS_KEY_Y);
+        String argX2 = paramMap.get(ARGS_KEY_X2);
+        String argY2 = paramMap.get(ARGS_KEY_Y2);
+        String ocrKey = paramMap.get(ARGS_KEY_OCRKEY);
+
         // key:要识别的文本
         String key = "接受";
         // keyIndex:选定截取图片范围, 识别文本重复, 通过 keyIndex 确定选定第几个, 从左上角开始, 逐行数, 注意长文本算一个元素
         int keyIndex = 0;
-        int startX = 1505;
+        /*int startX = 1505;
         int startY = 760;
         int width = 1845 - startX;
-        int height = 1010 - startY;
+        int height = 1010 - startY;*/
+        int startX = Integer.parseInt(argX);
+        int startY = Integer.parseInt(argY);
+        int width = Integer.parseInt(argX2) - startX;
+        int height = Integer.parseInt(argY2) - startY;
 
         // 截屏
-        BufferedImage bufferedImage = screenshotFull();
+/*        BufferedImage bufferedImage = screenshotFull();
         writeImage(bufferedImage, "C:\\Users\\Apple\\Desktop\\temp\\screenshot\\");
         // 切割图片
 
         bufferedImage = subImage(bufferedImage, startX, startY, width, height);
-        String imagePath = writeImage(bufferedImage, "C:\\Users\\Apple\\Desktop\\temp\\screenshot\\sub");
+        String imagePath = writeImage(bufferedImage, "C:\\Users\\Apple\\Desktop\\temp\\screenshot\\sub");*/
+        BufferedImage bufferedImage = screenshot(startX, startY, width, height);
+        String imagePath = writeImage(bufferedImage, "\\screenshot\\");
         // 定义exe路径及参数
-        String exePath = "C:\\Users\\Apple\\Desktop\\temp\\Release\\ppocr.exe";
-        String arg1 = "--det_model_dir=D:\\PaddleOCR\\model\\ch_PP-OCRv4_det_infer\\";
-        String arg2 = "--rec_model_dir=D:\\PaddleOCR\\model\\ch_PP-OCRv4_rec_infer\\";
-        String arg3 = "--rec_char_dict_path=D:\\PaddleOCR\\PaddleOCR-2.8.1\\ppocr\\utils\\ppocr_keys_v1.txt";
+//        String exePath = "C:\\Users\\Apple\\Desktop\\temp\\Release\\ppocr.exe";
+//        String arg1 = "--det_model_dir=D:\\PaddleOCR\\model\\ch_PP-OCRv4_det_infer\\";
+//        String arg2 = "--rec_model_dir=D:\\PaddleOCR\\model\\ch_PP-OCRv4_rec_infer\\";
+//        String arg3 = "--rec_char_dict_path=D:\\PaddleOCR\\PaddleOCR-2.8.1\\ppocr\\utils\\ppocr_keys_v1.txt";
+//        String arg4 = "--image_dir=" + imagePath;
+
+        String exePath = ".\\ppocr.exe";
+        String arg1 = "--det_model_dir=.\\ch_PP-OCRv4_det_infer\\";
+        String arg2 = "--rec_model_dir=.\\ch_PP-OCRv4_rec_infer\\";
+        String arg3 = "--rec_char_dict_path=.\\ppocr_keys_v1.txt";
         String arg4 = "--image_dir=" + imagePath;
         String[] cmdParams = {exePath, arg1, arg2, arg3, arg4};
         System.out.println("ocr识别image_dir:" + imagePath);
@@ -120,7 +180,7 @@ public class PaddleProcessBuilder {
 //                    System.out.println("avgWidth=" + avgWidth);
 //                    System.out.println("avgLength=" + avgLength);
                 // 点击位置x=截取开始+定位开始+avgWidth
-                // 点击位置y=截取开始+定位开始+avgWidth
+                // 点击位置y=截取开始+定位开始+avgLength
                 clickRight(startX + x0 + avgWidth, startY + y0 + avgLength);
             }
         }
@@ -234,7 +294,7 @@ public class PaddleProcessBuilder {
             File outputFile = new File(fileName);
             // 保存截图为文件
             ImageIO.write(bufferedImage, "png", outputFile);
-            return outputFile.getAbsolutePath();
+            return outputFile.getCanonicalPath();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -242,8 +302,15 @@ public class PaddleProcessBuilder {
 
     public static BufferedImage screenshotFull() {
         // 捕获屏幕截图
-        BufferedImage screenFullImage = ROBOT.createScreenCapture(SCREEN_RECT);
+        BufferedImage screenFullImage = ROBOT.createScreenCapture(FULL_SCREEN_RECTANGLE);
         return screenFullImage;
+    }
+
+    public static BufferedImage screenshot(int x, int y, int width, int height) {
+        Rectangle rectangle = new Rectangle(x, y, width, height);
+        // 捕获屏幕截图
+        BufferedImage screenCapture = ROBOT.createScreenCapture(rectangle);
+        return screenCapture;
     }
 
     /**
@@ -318,7 +385,7 @@ public class PaddleProcessBuilder {
             // 创建 Robot 对象
             ROBOT = new Robot();
             // 获取屏幕尺寸
-            SCREEN_RECT = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+            FULL_SCREEN_RECTANGLE = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
         } catch (AWTException e) {
             throw new RuntimeException(e);
         }
