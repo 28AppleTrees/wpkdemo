@@ -20,14 +20,35 @@ public class PaddleProcessBuilder {
     private static final Rectangle SCREEN_RECT;
     // windows屏幕缩放比例
     private static final double WIN_SCREEN_RATE = 1.25;
+
+    private static final ProcessBuilder PROCESS_BUILDER = new ProcessBuilder();
     // 创建一个单线程的ScheduledExecutorService
     private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) {
         PaddleProcessBuilder paddleProcessBuilder = new PaddleProcessBuilder();
-        paddleProcessBuilder.task(args);
+        Runnable task = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    paddleProcessBuilder.task(args);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    // 在捕获 InterruptedException 时，需要恢复线程的中断状态，否则线程的中断标志会被清除，这可能会导致其他依赖于中断标志的地方出现问题
+                    Thread.currentThread().interrupt();
+                    System.err.println("Executor was interrupted");
+                    throw new RuntimeException(e);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    executor.shutdown();
+                }
+            }
+        };
+        // 延迟1秒后首次执行，并且之后每3秒执行一次
+        executor.scheduleAtFixedRate(task, 1, 3, TimeUnit.SECONDS);
     }
 
     /**
@@ -58,7 +79,7 @@ public class PaddleProcessBuilder {
         String arg3 = "--rec_char_dict_path=D:\\PaddleOCR\\PaddleOCR-2.8.1\\ppocr\\utils\\ppocr_keys_v1.txt";
         String arg4 = "--image_dir=" + imagePath;
         String[] cmdParams = {exePath, arg1, arg2, arg3, arg4};
-
+        System.out.println("ocr识别image_dir:" + imagePath);
         // 识别文本
         List<String> ocrResult = ocrProcess(cmdParams);
         List<String[]> textResultList = parseORCResult(ocrResult);
@@ -72,6 +93,9 @@ public class PaddleProcessBuilder {
         List<String[]> collectList = textResultList.stream()
                 .filter(array -> Arrays.stream(array).anyMatch(s -> s.contains(key)))
                 .collect(Collectors.toList());
+        if (collectList.isEmpty()) {
+            return;
+        }
         String[] strings = collectList.get(keyIndex);
         // [[97,209],[137,209],[137,228],[97,228]], 接受, 0.980375
         if (strings.length >= 3) {
@@ -124,10 +148,11 @@ public class PaddleProcessBuilder {
     }
 
     public static java.util.List<String> ocrProcess(String[] cmdParams) throws IOException, InterruptedException {
-        // 使用ProcessBuilder类执行命令
-        ProcessBuilder pb = new ProcessBuilder(cmdParams);
-        pb.redirectErrorStream(true); // 将错误流重定向到标准输出流
-        Process process = pb.start();
+        // 使用ProcessBuilder类执行命令, command每次调用是覆盖操作
+        PROCESS_BUILDER.command(cmdParams);
+        PROCESS_BUILDER.redirectErrorStream(true); // 将错误流重定向到标准输出流
+
+        Process process = PROCESS_BUILDER.start();
 
         // 获取进程的输出流
         try (
@@ -148,7 +173,7 @@ public class PaddleProcessBuilder {
 
             // 等待程序执行完成
             int exitCode = process.waitFor();
-            System.out.println("Program exited with code: " + exitCode);
+//            System.out.println("Program exited with code: " + exitCode);
             return lineList;
         }
     }
