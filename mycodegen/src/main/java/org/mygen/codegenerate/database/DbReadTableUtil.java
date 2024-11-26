@@ -50,15 +50,14 @@ public class DbReadTableUtil {
             log.info(" connect databaseName : " + catalog);
             if (DatabaseUtil.a(GenerateConfig.url)) {
                 sql = MessageFormat.format("SELECT TABLE_SCHEMA `database`, TABLE_NAME tableName, TABLE_COMMENT 'comment' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA = {0} AND TABLE_NAME = {1}", org.mygen.codegenerate.generate.util.f.c(catalog), org.mygen.codegenerate.generate.util.f.c(tableName));
+            } else if (DatabaseUtil.b(GenerateConfig.url)) {
+                sql = MessageFormat.format("SELECT OWNER AS \"database\", TABLE_NAME AS \"table_name\", COMMENTS AS \"comment\" FROM ALL_TAB_COMMENTS WHERE table_name = {0}", org.mygen.codegenerate.generate.util.f.c(tableName));
             } else {
-                throw new Exception("表详情查询仅支持mysql");
+                throw new Exception("表详情查询仅支持mysql, oracle");
             }
-            // todo mygen 其他类型数据库查表详情sql
-            /*if (DatabaseUtil.b(GenerateConfig.url)) {
-                sql = " select distinct colstable.table_name as  table_name from user_tab_cols colstable order by colstable.table_name";
-            }
+            // todo mygen 其他类型数据库查表注释sql
 
-            if (DatabaseUtil.d(GenerateConfig.url)) {
+            /*if (DatabaseUtil.d(GenerateConfig.url)) {
                 if (GenerateConfig.a.indexOf(",") == -1) {
                     sql = MessageFormat.format("select tablename from pg_tables where schemaname in( {0} )", org.mygen.codegenerate.generate.util.f.c(GenerateConfig.a));
                 } else {
