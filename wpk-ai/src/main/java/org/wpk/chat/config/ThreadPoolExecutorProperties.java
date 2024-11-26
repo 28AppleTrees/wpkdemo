@@ -8,9 +8,12 @@ import org.springframework.stereotype.Component;
  * 阿里通义千问配置项
  */
 @Component
-@ConfigurationProperties(prefix = "ai.tongyiqianwen")
+@ConfigurationProperties(prefix = "ai.tongyiqianwen.threadpool")
 @Data
-public class TongYiProperties {
-    private String apikey;
-    private String url;
+public class ThreadPoolExecutorProperties {
+
+    private Integer core;
+    private Integer max;
+    private Long keepAlive;
+
 }

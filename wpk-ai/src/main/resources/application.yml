@@ -9,3 +9,16 @@ logging:
     root: info
   # 日志配置文件
   config: classpath:log4j2-spring-${spring.profiles.active}.xml
+
+mybatis-plus:
+  mapper-locations: classpath:org/wpk/chat/mapper/**/*.xml
+
+ai:
+  tongyiqianwen:
+    url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
+    apikey:
+
+    threadpool:
+      core: 10
+      max: 11
+      keepAlive: 60
