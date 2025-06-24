@@ -5,9 +5,7 @@ import org.mygen.codegenerate.generate.impl.CodeGenerateOne;
 import org.mygen.codegenerate.generate.pojo.TableVo;
 import org.mygen.codegenerate.generate.util.f;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 public class MyGen {
 
@@ -19,16 +17,15 @@ public class MyGen {
      * 使用的是resources\mygen\code-template\one的模板
      */
     private static void gen() {
-        HashSet<String> tableNames = new HashSet<>();
+        Set<String> tableNames = new LinkedHashSet<>();
         // 表名
-        tableNames.add("jw_apply");
-        tableNames.add("jw_apply_user");
+        tableNames.add("TEST_EMS_TRANSFORMER");
         // 包名
-        String entityPackage = "jw";
+        String entityPackage = "design.test";
 
         // Map<表名, 注释>, 自定义注释Map
         Map<String, String> commentMap = new HashMap<>();
-        commentMap.put("i74mb_bahdjgbag", "云枢需求工单表");
+        commentMap.put("DOO_CRT_PACKAGE", "作业包");
 
         for (String tableName : tableNames) {
             try {

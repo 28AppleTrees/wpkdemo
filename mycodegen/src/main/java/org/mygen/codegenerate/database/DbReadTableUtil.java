@@ -204,7 +204,7 @@ public class DbReadTableUtil {
             }
 
             if (DatabaseUtil.b(GenerateConfig.url)) {
-                sql = MessageFormat.format(" select colstable.column_name column_name, colstable.data_type data_type, commentstable.comments column_comment, colstable.Data_Precision column_precision, colstable.Data_Scale column_scale,colstable.Char_Length,colstable.nullable from user_tab_cols colstable  inner join user_col_comments commentstable  on colstable.column_name = commentstable.column_name  where colstable.table_name = commentstable.table_name  and colstable.table_name = {0}", org.mygen.codegenerate.generate.util.f.c(var0.toUpperCase()));
+                sql = MessageFormat.format(" select colstable.column_name column_name, colstable.data_type data_type, commentstable.comments column_comment, colstable.Data_Precision column_precision, colstable.Data_Scale column_scale,colstable.Char_Length,colstable.nullable from user_tab_cols colstable  inner join user_col_comments commentstable  on colstable.column_name = commentstable.column_name  where colstable.table_name = commentstable.table_name  and colstable.table_name = {0} ORDER BY colstable.column_id", org.mygen.codegenerate.generate.util.f.c(var0.toUpperCase()));
             }
 
             if (DatabaseUtil.d(GenerateConfig.url)) {
@@ -332,7 +332,7 @@ public class DbReadTableUtil {
             }
 
             if (DatabaseUtil.b(GenerateConfig.url)) {
-                sql = MessageFormat.format(" select colstable.column_name column_name, colstable.data_type data_type, commentstable.comments column_comment, colstable.Data_Precision column_precision, colstable.Data_Scale column_scale,colstable.Char_Length,colstable.nullable from user_tab_cols colstable  inner join user_col_comments commentstable  on colstable.column_name = commentstable.column_name  where colstable.table_name = commentstable.table_name  and colstable.table_name = {0}", org.mygen.codegenerate.generate.util.f.c(tableName.toUpperCase()));
+                sql = MessageFormat.format(" select colstable.column_name column_name, colstable.data_type data_type, commentstable.comments column_comment, colstable.Data_Precision column_precision, colstable.Data_Scale column_scale,colstable.Char_Length,colstable.nullable from user_tab_cols colstable  inner join user_col_comments commentstable  on colstable.column_name = commentstable.column_name  where colstable.table_name = commentstable.table_name  and colstable.table_name = {0} ORDER BY colstable.column_id", org.mygen.codegenerate.generate.util.f.c(tableName.toUpperCase()));
             }
 
             if (DatabaseUtil.d(GenerateConfig.url)) {

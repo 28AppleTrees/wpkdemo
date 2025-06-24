@@ -32,9 +32,9 @@ import java.util.Map;
  */
 @Api(tags="${tableVo.ftlDescription}")
 @RestController
-@RequestMapping("/${entityPackage}/${entityName?uncap_first}")
+@RequestMapping("/${entityPackage?replace(".", "/")}/${entityName?uncap_first}")
 @Slf4j
-public class ${entityName}Controller  {
+public class ${entityName}Controller {
 	@Autowired
 	private I${entityName}Service ${entityName?uncap_first}Service;
 
